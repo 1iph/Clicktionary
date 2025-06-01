@@ -3,11 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Languages, BookOpen, Heart, Volume2, Moon, Sun, Plus } from 'lucide-react';
+import { Languages, BookOpen, Heart, Moon, Sun, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import WordDefinition from '@/components/WordDefinition';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -16,6 +13,7 @@ import TextDisplay from '@/components/TextDisplay';
 
 const Index = () => {
   const [text, setText] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
   const [sourceLanguage, setSourceLanguage] = useState('auto');
   const [targetLanguage, setTargetLanguage] = useState('en');
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
@@ -23,16 +21,72 @@ const Index = () => {
   const [savedWords, setSavedWords] = useState<any[]>([]);
   const [darkMode, setDarkMode] = useState(false);
   const [showVocabulary, setShowVocabulary] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
 
+  // Load saved words from localStorage on component mount
   useEffect(() => {
-    // Apply dark mode class to document
+    const saved = localStorage.getItem('clicktionary-vocabulary');
+    if (saved) {
+      try {
+        setSavedWords(JSON.parse(saved));
+      } catch (error) {
+        console.error('Error loading saved vocabulary:', error);
+      }
+    }
+  }, []);
+
+  // Save words to localStorage whenever savedWords changes
+  useEffect(() => {
+    localStorage.setItem('clicktionary-vocabulary', JSON.stringify(savedWords));
+  }, [savedWords]);
+
+  useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  const translateText = async () => {
+    if (!text.trim() || sourceLanguage === targetLanguage) {
+      toast({
+        title: "Translation not needed",
+        description: "Please enter text and select different source/target languages.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsTranslating(true);
+    try {
+      // Using MyMemory Translation API (free)
+      const response = await fetch(
+        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLanguage}|${targetLanguage}`
+      );
+      const data = await response.json();
+      
+      if (data.responseStatus === 200) {
+        setTranslatedText(data.responseData.translatedText);
+        toast({
+          title: "Translation complete",
+          description: "Text has been translated successfully."
+        });
+      } else {
+        throw new Error('Translation failed');
+      }
+    } catch (error) {
+      console.error('Translation error:', error);
+      setTranslatedText(`Translation failed. Showing original text: ${text}`);
+      toast({
+        title: "Translation failed",
+        description: "Using a fallback translation service. Results may vary.",
+        variant: "destructive"
+      });
+    }
+    setIsTranslating(false);
+  };
 
   const handleWordClick = (word: string, position: { x: number, y: number }) => {
     setSelectedWord(word);
@@ -59,6 +113,8 @@ const Index = () => {
   };
 
   const sampleText = `The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet and is commonly used for testing fonts and keyboards. Language learning becomes more effective when students engage with authentic materials that challenge their vocabulary knowledge.`;
+
+  const hebrewSample = `השועל החום הזריז קופץ מעל הכלב העצלן. זה משפט שמכיל הרבה אותיות בעברית ומשמש לבדיקת גופנים ומקלדות.`;
 
   return (
     <div className={`min-h-screen transition-all duration-300 ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'}`}>
@@ -122,31 +178,50 @@ const Index = () => {
             <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Enter Text</CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setText(sampleText)}
-                  >
-                    Load Sample
-                  </Button>
+                  <CardTitle>Enter Text ({sourceLanguage === 'auto' ? 'Auto-detect' : sourceLanguage})</CardTitle>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setText(sampleText)}
+                    >
+                      English Sample
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setText(hebrewSample)}
+                    >
+                      Hebrew Sample
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <Textarea
                   placeholder="Paste your text here to start learning..."
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   className="min-h-[120px] resize-none border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500"
+                  dir={sourceLanguage === 'he' ? 'rtl' : 'ltr'}
                 />
+                {text && sourceLanguage !== targetLanguage && (
+                  <Button 
+                    onClick={translateText} 
+                    disabled={isTranslating}
+                    className="w-full"
+                  >
+                    {isTranslating ? 'Translating...' : `Translate to ${targetLanguage}`}
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
-            {/* Text Display */}
+            {/* Original Text Display */}
             {text && (
               <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Interactive Text</CardTitle>
+                  <CardTitle>Original Text ({sourceLanguage === 'auto' ? 'Auto-detected' : sourceLanguage})</CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Click on any word to see its definition, pronunciation, and more
                   </p>
@@ -156,6 +231,25 @@ const Index = () => {
                     text={text}
                     onWordClick={handleWordClick}
                     sourceLanguage={sourceLanguage}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Translated Text Display */}
+            {translatedText && sourceLanguage !== targetLanguage && (
+              <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle>Translated Text ({targetLanguage})</CardTitle>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Click on words in the translated text to learn more
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <TextDisplay
+                    text={translatedText}
+                    onWordClick={handleWordClick}
+                    sourceLanguage={targetLanguage}
                   />
                 </CardContent>
               </Card>

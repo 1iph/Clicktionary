@@ -36,6 +36,8 @@ const getDifficultyColor = (word: string): string => {
 };
 
 const TextDisplay: React.FC<TextDisplayProps> = ({ text, onWordClick, sourceLanguage }) => {
+  const isRTL = sourceLanguage === 'he' || sourceLanguage === 'ar';
+  
   const processedText = useMemo(() => {
     // Split text into words while preserving punctuation and spaces
     const tokens = text.split(/(\s+|[^\w\s])/);
@@ -70,7 +72,10 @@ const TextDisplay: React.FC<TextDisplayProps> = ({ text, onWordClick, sourceLang
 
   return (
     <div className="prose prose-lg max-w-none dark:prose-invert">
-      <div className="leading-relaxed text-gray-800 dark:text-gray-200 select-text">
+      <div 
+        className={`leading-relaxed text-gray-800 dark:text-gray-200 select-text ${isRTL ? 'text-right' : 'text-left'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         {processedText}
       </div>
     </div>

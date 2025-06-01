@@ -23,6 +23,7 @@ const languages = [
   { code: 'ko', name: 'Korean' },
   { code: 'zh', name: 'Chinese' },
   { code: 'ar', name: 'Arabic' },
+  { code: 'he', name: 'Hebrew' },
   { code: 'hi', name: 'Hindi' }
 ];
 
