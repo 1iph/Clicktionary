@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,7 @@ interface WordDefinitionProps {
   onClose: () => void;
 }
 
-// Mock data - in a real app, this would come from dictionary APIs
+// Expanded mock data with more words
 const getWordData = (word: string) => {
   const mockData = {
     'quick': {
@@ -64,21 +63,221 @@ const getWordData = (word: string) => {
         'de': 'authentisch',
         'it': 'autentico'
       }
+    },
+    'brown': {
+      word: 'brown',
+      pronunciation: '/braʊn/',
+      partOfSpeech: 'adjective',
+      cefr: 'A2',
+      frequency: 'High',
+      definitions: [
+        'A color that is a mixture of red, yellow, and black',
+        'Having the color of wood or chocolate'
+      ],
+      synonyms: ['tan', 'chestnut', 'chocolate', 'coffee'],
+      antonyms: ['white', 'light'],
+      examples: [
+        'The brown dog ran across the field.',
+        'She has beautiful brown eyes.'
+      ],
+      translations: {
+        'es': 'marrón',
+        'fr': 'brun',
+        'de': 'braun',
+        'it': 'marrone'
+      }
+    },
+    'fox': {
+      word: 'fox',
+      pronunciation: '/fɒks/',
+      partOfSpeech: 'noun',
+      cefr: 'A2',
+      frequency: 'Medium',
+      definitions: [
+        'A wild animal with reddish fur and a bushy tail',
+        'A clever or cunning person'
+      ],
+      synonyms: ['vixen', 'canine'],
+      antonyms: [],
+      examples: [
+        'The red fox is native to many countries.',
+        'He\'s a sly old fox when it comes to business.'
+      ],
+      translations: {
+        'es': 'zorro',
+        'fr': 'renard',
+        'de': 'fuchs',
+        'it': 'volpe'
+      }
+    },
+    'jumps': {
+      word: 'jumps',
+      pronunciation: '/dʒʌmps/',
+      partOfSpeech: 'verb',
+      cefr: 'B1',
+      frequency: 'High',
+      definitions: [
+        'Moves quickly off the ground by pushing with the legs',
+        'Moves suddenly or quickly'
+      ],
+      synonyms: ['leaps', 'bounds', 'hops', 'springs'],
+      antonyms: ['falls', 'drops'],
+      examples: [
+        'The cat jumps onto the table.',
+        'She jumps to conclusions too quickly.'
+      ],
+      translations: {
+        'es': 'salta',
+        'fr': 'saute',
+        'de': 'springt',
+        'it': 'salta'
+      }
+    },
+    'lazy': {
+      word: 'lazy',
+      pronunciation: '/ˈleɪzi/',
+      partOfSpeech: 'adjective',
+      cefr: 'B1',
+      frequency: 'Medium',
+      definitions: [
+        'Unwilling to work or be active',
+        'Moving slowly or appearing to require little effort'
+      ],
+      synonyms: ['idle', 'sluggish', 'inactive', 'lethargic'],
+      antonyms: ['active', 'energetic', 'hardworking', 'diligent'],
+      examples: [
+        'He\'s too lazy to do his homework.',
+        'It was a lazy summer afternoon.'
+      ],
+      translations: {
+        'es': 'perezoso',
+        'fr': 'paresseux',
+        'de': 'faul',
+        'it': 'pigro'
+      }
+    },
+    'pangram': {
+      word: 'pangram',
+      pronunciation: '/ˈpænɡræm/',
+      partOfSpeech: 'noun',
+      cefr: 'C1',
+      frequency: 'Low',
+      definitions: [
+        'A sentence that contains every letter of the alphabet at least once'
+      ],
+      synonyms: ['holoalphabetic sentence'],
+      antonyms: [],
+      examples: [
+        'The quick brown fox jumps over the lazy dog is a famous pangram.',
+        'Pangrams are often used to test fonts and keyboards.'
+      ],
+      translations: {
+        'es': 'pangrama',
+        'fr': 'pangramme',
+        'de': 'pangramm',
+        'it': 'pangramma'
+      }
+    },
+    'language': {
+      word: 'language',
+      pronunciation: '/ˈlæŋɡwɪdʒ/',
+      partOfSpeech: 'noun',
+      cefr: 'A2',
+      frequency: 'High',
+      definitions: [
+        'A system of communication used by people',
+        'The words and expressions used in a particular field'
+      ],
+      synonyms: ['tongue', 'speech', 'dialect', 'vocabulary'],
+      antonyms: [],
+      examples: [
+        'English is a global language.',
+        'She speaks three languages fluently.'
+      ],
+      translations: {
+        'es': 'idioma',
+        'fr': 'langue',
+        'de': 'sprache',
+        'it': 'lingua'
+      }
+    },
+    'learning': {
+      word: 'learning',
+      pronunciation: '/ˈlɜːrnɪŋ/',
+      partOfSpeech: 'noun',
+      cefr: 'A2',
+      frequency: 'High',
+      definitions: [
+        'The process of acquiring knowledge or skills',
+        'Knowledge gained through study or experience'
+      ],
+      synonyms: ['education', 'study', 'training', 'instruction'],
+      antonyms: ['ignorance'],
+      examples: [
+        'Learning a new language takes time and practice.',
+        'Online learning has become very popular.'
+      ],
+      translations: {
+        'es': 'aprendizaje',
+        'fr': 'apprentissage',
+        'de': 'lernen',
+        'it': 'apprendimento'
+      }
+    },
+    'vocabulary': {
+      word: 'vocabulary',
+      pronunciation: '/vəˈkæbjʊləri/',
+      partOfSpeech: 'noun',
+      cefr: 'B1',
+      frequency: 'Medium',
+      definitions: [
+        'All the words known and used by a person',
+        'The words used in a particular language or subject'
+      ],
+      synonyms: ['lexicon', 'wordstock', 'terminology'],
+      antonyms: [],
+      examples: [
+        'Reading helps expand your vocabulary.',
+        'Medical vocabulary can be difficult to understand.'
+      ],
+      translations: {
+        'es': 'vocabulario',
+        'fr': 'vocabulaire',
+        'de': 'wortschatz',
+        'it': 'vocabolario'
+      }
     }
   };
 
-  return mockData[word as keyof typeof mockData] || {
-    word,
-    pronunciation: `/${word}/`,
-    partOfSpeech: 'unknown',
-    cefr: 'Unknown',
-    frequency: 'Unknown',
-    definitions: [`Definition for "${word}" not available`],
-    synonyms: [],
-    antonyms: [],
-    examples: [],
-    translations: {}
-  };
+  // If word not found in mock data, create a basic definition
+  if (!mockData[word as keyof typeof mockData]) {
+    return {
+      word,
+      pronunciation: `/${word}/`,
+      partOfSpeech: 'word',
+      cefr: 'Unknown',
+      frequency: 'Unknown',
+      definitions: [`Definition for "${word}" - a word in the text`],
+      synonyms: [],
+      antonyms: [],
+      examples: [`Example with "${word}" would appear here.`],
+      translations: {
+        'es': `${word} (Spanish)`,
+        'fr': `${word} (French)`,
+        'de': `${word} (German)`,
+        'it': `${word} (Italian)`,
+        'pt': `${word} (Portuguese)`,
+        'ru': `${word} (Russian)`,
+        'ja': `${word} (Japanese)`,
+        'ko': `${word} (Korean)`,
+        'zh': `${word} (Chinese)`,
+        'ar': `${word} (Arabic)`,
+        'hi': `${word} (Hindi)`
+      }
+    };
+  }
+
+  return mockData[word as keyof typeof mockData];
 };
 
 const WordDefinition: React.FC<WordDefinitionProps> = ({
@@ -100,7 +299,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
       const data = getWordData(word);
       setWordData(data);
       setIsLoading(false);
-    }, 500);
+    }, 300);
   }, [word]);
 
   const playPronunciation = () => {
@@ -253,14 +452,14 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
         )}
 
         {/* Translation */}
-        {targetLanguage !== sourceLanguage && wordData.translations[targetLanguage] && (
+        {targetLanguage !== sourceLanguage && (
           <div>
             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2 flex items-center space-x-1">
               <Globe className="h-3 w-3" />
               <span>Translation</span>
             </h4>
             <Badge className="bg-blue-500 text-white">
-              {wordData.translations[targetLanguage]}
+              {wordData.translations[targetLanguage] || `${word} (${targetLanguage})`}
             </Badge>
           </div>
         )}
