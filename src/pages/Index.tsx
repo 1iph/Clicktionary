@@ -114,7 +114,7 @@ const Index = () => {
 
   const sampleText = `The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet and is commonly used for testing fonts and keyboards. Language learning becomes more effective when students engage with authentic materials that challenge their vocabulary knowledge.`;
 
-  const hebrewSample = `השועל החום הזריז קופץ מעל הכלב העצלן. זה משפט שמכיל הרבה אותיות בעברית ומשמש לבדיקת גופנים ומקלדות.`;
+
 
   return (
     <div className={`min-h-screen transition-all duration-300 ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'}`}>
@@ -187,13 +187,7 @@ const Index = () => {
                     >
                       English Sample
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setText(hebrewSample)}
-                    >
-                      Hebrew Sample
-                    </Button>
+
                   </div>
                 </div>
               </CardHeader>
