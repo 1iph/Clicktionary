@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Volume2, Heart, X, BookOpen, Globe } from 'lucide-react';
+import { Volume2, Heart, X, BookOpen, Globe, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface WordDefinitionProps {
@@ -15,269 +16,37 @@ interface WordDefinitionProps {
   onClose: () => void;
 }
 
-// Expanded mock data with more words
-const getWordData = (word: string) => {
-  const mockData = {
-    'quick': {
-      word: 'quick',
-      pronunciation: '/kwɪk/',
-      partOfSpeech: 'adjective',
-      cefr: 'A2',
-      frequency: 'High',
-      definitions: [
-        'Moving fast or doing something in a short time',
-        'Happening in a short time'
-      ],
-      synonyms: ['fast', 'rapid', 'swift', 'speedy'],
-      antonyms: ['slow', 'sluggish', 'gradual'],
-      examples: [
-        'She gave a quick glance at her watch.',
-        'We need a quick solution to this problem.'
-      ],
-      translations: {
-        'es': 'rápido',
-        'fr': 'rapide',
-        'de': 'schnell',
-        'it': 'veloce'
-      }
-    },
-    'authentic': {
-      word: 'authentic',
-      pronunciation: '/ɔːˈθentɪk/',
-      partOfSpeech: 'adjective',
-      cefr: 'C1',
-      frequency: 'Medium',
-      definitions: [
-        'Real or genuine; not copied or false',
-        'True to one\'s own personality, spirit, or character'
-      ],
-      synonyms: ['genuine', 'real', 'original', 'legitimate'],
-      antonyms: ['fake', 'artificial', 'counterfeit', 'false'],
-      examples: [
-        'The restaurant serves authentic Italian cuisine.',
-        'She wanted to be authentic in her presentation.'
-      ],
-      translations: {
-        'es': 'auténtico',
-        'fr': 'authentique',
-        'de': 'authentisch',
-        'it': 'autentico'
-      }
-    },
-    'brown': {
-      word: 'brown',
-      pronunciation: '/braʊn/',
-      partOfSpeech: 'adjective',
-      cefr: 'A2',
-      frequency: 'High',
-      definitions: [
-        'A color that is a mixture of red, yellow, and black',
-        'Having the color of wood or chocolate'
-      ],
-      synonyms: ['tan', 'chestnut', 'chocolate', 'coffee'],
-      antonyms: ['white', 'light'],
-      examples: [
-        'The brown dog ran across the field.',
-        'She has beautiful brown eyes.'
-      ],
-      translations: {
-        'es': 'marrón',
-        'fr': 'brun',
-        'de': 'braun',
-        'it': 'marrone'
-      }
-    },
-    'fox': {
-      word: 'fox',
-      pronunciation: '/fɒks/',
-      partOfSpeech: 'noun',
-      cefr: 'A2',
-      frequency: 'Medium',
-      definitions: [
-        'A wild animal with reddish fur and a bushy tail',
-        'A clever or cunning person'
-      ],
-      synonyms: ['vixen', 'canine'],
-      antonyms: [],
-      examples: [
-        'The red fox is native to many countries.',
-        'He\'s a sly old fox when it comes to business.'
-      ],
-      translations: {
-        'es': 'zorro',
-        'fr': 'renard',
-        'de': 'fuchs',
-        'it': 'volpe'
-      }
-    },
-    'jumps': {
-      word: 'jumps',
-      pronunciation: '/dʒʌmps/',
-      partOfSpeech: 'verb',
-      cefr: 'B1',
-      frequency: 'High',
-      definitions: [
-        'Moves quickly off the ground by pushing with the legs',
-        'Moves suddenly or quickly'
-      ],
-      synonyms: ['leaps', 'bounds', 'hops', 'springs'],
-      antonyms: ['falls', 'drops'],
-      examples: [
-        'The cat jumps onto the table.',
-        'She jumps to conclusions too quickly.'
-      ],
-      translations: {
-        'es': 'salta',
-        'fr': 'saute',
-        'de': 'springt',
-        'it': 'salta'
-      }
-    },
-    'lazy': {
-      word: 'lazy',
-      pronunciation: '/ˈleɪzi/',
-      partOfSpeech: 'adjective',
-      cefr: 'B1',
-      frequency: 'Medium',
-      definitions: [
-        'Unwilling to work or be active',
-        'Moving slowly or appearing to require little effort'
-      ],
-      synonyms: ['idle', 'sluggish', 'inactive', 'lethargic'],
-      antonyms: ['active', 'energetic', 'hardworking', 'diligent'],
-      examples: [
-        'He\'s too lazy to do his homework.',
-        'It was a lazy summer afternoon.'
-      ],
-      translations: {
-        'es': 'perezoso',
-        'fr': 'paresseux',
-        'de': 'faul',
-        'it': 'pigro'
-      }
-    },
-    'pangram': {
-      word: 'pangram',
-      pronunciation: '/ˈpænɡræm/',
-      partOfSpeech: 'noun',
-      cefr: 'C1',
-      frequency: 'Low',
-      definitions: [
-        'A sentence that contains every letter of the alphabet at least once'
-      ],
-      synonyms: ['holoalphabetic sentence'],
-      antonyms: [],
-      examples: [
-        'The quick brown fox jumps over the lazy dog is a famous pangram.',
-        'Pangrams are often used to test fonts and keyboards.'
-      ],
-      translations: {
-        'es': 'pangrama',
-        'fr': 'pangramme',
-        'de': 'pangramm',
-        'it': 'pangramma'
-      }
-    },
-    'language': {
-      word: 'language',
-      pronunciation: '/ˈlæŋɡwɪdʒ/',
-      partOfSpeech: 'noun',
-      cefr: 'A2',
-      frequency: 'High',
-      definitions: [
-        'A system of communication used by people',
-        'The words and expressions used in a particular field'
-      ],
-      synonyms: ['tongue', 'speech', 'dialect', 'vocabulary'],
-      antonyms: [],
-      examples: [
-        'English is a global language.',
-        'She speaks three languages fluently.'
-      ],
-      translations: {
-        'es': 'idioma',
-        'fr': 'langue',
-        'de': 'sprache',
-        'it': 'lingua'
-      }
-    },
-    'learning': {
-      word: 'learning',
-      pronunciation: '/ˈlɜːrnɪŋ/',
-      partOfSpeech: 'noun',
-      cefr: 'A2',
-      frequency: 'High',
-      definitions: [
-        'The process of acquiring knowledge or skills',
-        'Knowledge gained through study or experience'
-      ],
-      synonyms: ['education', 'study', 'training', 'instruction'],
-      antonyms: ['ignorance'],
-      examples: [
-        'Learning a new language takes time and practice.',
-        'Online learning has become very popular.'
-      ],
-      translations: {
-        'es': 'aprendizaje',
-        'fr': 'apprentissage',
-        'de': 'lernen',
-        'it': 'apprendimento'
-      }
-    },
-    'vocabulary': {
-      word: 'vocabulary',
-      pronunciation: '/vəˈkæbjʊləri/',
-      partOfSpeech: 'noun',
-      cefr: 'B1',
-      frequency: 'Medium',
-      definitions: [
-        'All the words known and used by a person',
-        'The words used in a particular language or subject'
-      ],
-      synonyms: ['lexicon', 'wordstock', 'terminology'],
-      antonyms: [],
-      examples: [
-        'Reading helps expand your vocabulary.',
-        'Medical vocabulary can be difficult to understand.'
-      ],
-      translations: {
-        'es': 'vocabulario',
-        'fr': 'vocabulaire',
-        'de': 'wortschatz',
-        'it': 'vocabolario'
-      }
+interface DictionaryResponse {
+  word: string;
+  phonetics: Array<{
+    text?: string;
+    audio?: string;
+  }>;
+  meanings: Array<{
+    partOfSpeech: string;
+    definitions: Array<{
+      definition: string;
+      example?: string;
+      synonyms?: string[];
+      antonyms?: string[];
+    }>;
+    synonyms?: string[];
+    antonyms?: string[];
+  }>;
+}
+
+const fetchWordDefinition = async (word: string): Promise<DictionaryResponse | null> => {
+  try {
+    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+    if (!response.ok) {
+      throw new Error('Word not found');
     }
-  };
-
-  // If word not found in mock data, create a basic definition
-  if (!mockData[word as keyof typeof mockData]) {
-    return {
-      word,
-      pronunciation: `/${word}/`,
-      partOfSpeech: 'word',
-      cefr: 'Unknown',
-      frequency: 'Unknown',
-      definitions: [`Definition for "${word}" - a word in the text`],
-      synonyms: [],
-      antonyms: [],
-      examples: [`Example with "${word}" would appear here.`],
-      translations: {
-        'es': `${word} (Spanish)`,
-        'fr': `${word} (French)`,
-        'de': `${word} (German)`,
-        'it': `${word} (Italian)`,
-        'pt': `${word} (Portuguese)`,
-        'ru': `${word} (Russian)`,
-        'ja': `${word} (Japanese)`,
-        'ko': `${word} (Korean)`,
-        'zh': `${word} (Chinese)`,
-        'ar': `${word} (Arabic)`,
-        'hi': `${word} (Hindi)`
-      }
-    };
+    const data = await response.json();
+    return data[0]; // Return the first result
+  } catch (error) {
+    console.error('Dictionary API error:', error);
+    return null;
   }
-
-  return mockData[word as keyof typeof mockData];
 };
 
 const WordDefinition: React.FC<WordDefinitionProps> = ({
@@ -288,21 +57,44 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
   onSave,
   onClose
 }) => {
-  const [wordData, setWordData] = useState<any>(null);
+  const [wordData, setWordData] = useState<DictionaryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    setIsLoading(true);
-    // Simulate API call delay
-    setTimeout(() => {
-      const data = getWordData(word);
-      setWordData(data);
+    const loadWordData = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      const data = await fetchWordDefinition(word);
+      if (data) {
+        setWordData(data);
+      } else {
+        setError(`No definition found for "${word}"`);
+      }
       setIsLoading(false);
-    }, 300);
+    };
+
+    loadWordData();
   }, [word]);
 
   const playPronunciation = () => {
+    // Try to use audio from the API first
+    const audioUrl = wordData?.phonetics?.find(p => p.audio)?.audio;
+    
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play().catch(() => {
+        // Fallback to speech synthesis
+        useSpeechSynthesis();
+      });
+    } else {
+      useSpeechSynthesis();
+    }
+  };
+
+  const useSpeechSynthesis = () => {
     if ('speechSynthesis' in window && wordData) {
       const utterance = new SpeechSynthesisUtterance(wordData.word);
       utterance.lang = sourceLanguage === 'auto' ? 'en-US' : sourceLanguage;
@@ -318,23 +110,25 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
 
   const handleSave = () => {
     if (wordData) {
-      onSave(wordData);
-    }
-  };
-
-  const getCefrColor = (level: string) => {
-    switch (level) {
-      case 'A1':
-      case 'A2':
-        return 'bg-green-500';
-      case 'B1':
-      case 'B2':
-        return 'bg-yellow-500';
-      case 'C1':
-      case 'C2':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
+      // Convert API data to our internal format
+      const saveData = {
+        word: wordData.word,
+        pronunciation: wordData.phonetics?.[0]?.text || `/${wordData.word}/`,
+        partOfSpeech: wordData.meanings?.[0]?.partOfSpeech || 'word',
+        definitions: wordData.meanings?.flatMap(m => 
+          m.definitions.map(d => d.definition)
+        ).slice(0, 3) || [],
+        examples: wordData.meanings?.flatMap(m => 
+          m.definitions.map(d => d.example).filter(Boolean)
+        ).slice(0, 2) || [],
+        synonyms: wordData.meanings?.flatMap(m => 
+          [...(m.synonyms || []), ...m.definitions.flatMap(d => d.synonyms || [])]
+        ).slice(0, 5) || [],
+        antonyms: wordData.meanings?.flatMap(m => 
+          [...(m.antonyms || []), ...m.definitions.flatMap(d => d.antonyms || [])]
+        ).slice(0, 5) || []
+      };
+      onSave(saveData);
     }
   };
 
@@ -344,12 +138,50 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
         <CardContent className="p-6">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Loading definition...</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Looking up definition...</span>
           </div>
         </CardContent>
       </Card>
     );
   }
+
+  if (error) {
+    return (
+      <Card className="shadow-xl border-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm animate-fade-in">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-500" />
+              <CardTitle className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                Definition Not Found
+              </CardTitle>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600 dark:text-gray-400">{error}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+            Try checking the spelling or searching for a different word.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!wordData) return null;
+
+  const primaryPhonetic = wordData.phonetics?.find(p => p.text)?.text || `/${wordData.word}/`;
+  const allDefinitions = wordData.meanings?.flatMap(m => m.definitions) || [];
+  const allExamples = allDefinitions.map(d => d.example).filter(Boolean).slice(0, 3);
+  const allSynonyms = wordData.meanings?.flatMap(m => 
+    [...(m.synonyms || []), ...m.definitions.flatMap(d => d.synonyms || [])]
+  ).slice(0, 6) || [];
+  const allAntonyms = wordData.meanings?.flatMap(m => 
+    [...(m.antonyms || []), ...m.definitions.flatMap(d => d.antonyms || [])]
+  ).slice(0, 6) || [];
 
   return (
     <Card className="shadow-xl border-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm animate-fade-in">
@@ -368,7 +200,7 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
         
         <div className="flex items-center space-x-3">
           <span className="text-gray-600 dark:text-gray-400 font-mono">
-            {wordData.pronunciation}
+            {primaryPhonetic}
           </span>
           <Button variant="outline" size="sm" onClick={playPronunciation}>
             <Volume2 className="h-3 w-3" />
@@ -376,41 +208,39 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <Badge variant="secondary" className="text-xs">
-            {wordData.partOfSpeech}
-          </Badge>
-          <Badge className={`text-xs text-white ${getCefrColor(wordData.cefr)}`}>
-            {wordData.cefr}
-          </Badge>
-          <Badge variant="outline" className="text-xs">
-            {wordData.frequency} frequency
-          </Badge>
+          {wordData.meanings?.map((meaning, index) => (
+            <Badge key={index} variant="secondary" className="text-xs">
+              {meaning.partOfSpeech}
+            </Badge>
+          ))}
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Definitions */}
-        <div>
-          <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2">
-            Definitions
-          </h4>
-          <ul className="space-y-1">
-            {wordData.definitions.map((def: string, index: number) => (
-              <li key={index} className="text-sm text-gray-600 dark:text-gray-400">
-                {index + 1}. {def}
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* Definitions by part of speech */}
+        {wordData.meanings?.map((meaning, meaningIndex) => (
+          <div key={meaningIndex}>
+            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2">
+              {meaning.partOfSpeech} definitions
+            </h4>
+            <ul className="space-y-1">
+              {meaning.definitions.slice(0, 2).map((def, defIndex) => (
+                <li key={defIndex} className="text-sm text-gray-600 dark:text-gray-400">
+                  {defIndex + 1}. {def.definition}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
 
         {/* Examples */}
-        {wordData.examples.length > 0 && (
+        {allExamples.length > 0 && (
           <div>
             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2">
               Examples
             </h4>
             <ul className="space-y-1">
-              {wordData.examples.map((example: string, index: number) => (
+              {allExamples.map((example, index) => (
                 <li key={index} className="text-sm text-gray-600 dark:text-gray-400 italic">
                   "{example}"
                 </li>
@@ -420,13 +250,13 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
         )}
 
         {/* Synonyms */}
-        {wordData.synonyms.length > 0 && (
+        {allSynonyms.length > 0 && (
           <div>
             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2">
               Synonyms
             </h4>
             <div className="flex flex-wrap gap-1">
-              {wordData.synonyms.map((synonym: string, index: number) => (
+              {allSynonyms.map((synonym, index) => (
                 <Badge key={index} variant="outline" className="text-xs">
                   {synonym}
                 </Badge>
@@ -436,31 +266,18 @@ const WordDefinition: React.FC<WordDefinitionProps> = ({
         )}
 
         {/* Antonyms */}
-        {wordData.antonyms.length > 0 && (
+        {allAntonyms.length > 0 && (
           <div>
             <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2">
               Antonyms
             </h4>
             <div className="flex flex-wrap gap-1">
-              {wordData.antonyms.map((antonym: string, index: number) => (
+              {allAntonyms.map((antonym, index) => (
                 <Badge key={index} variant="outline" className="text-xs">
                   {antonym}
                 </Badge>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Translation */}
-        {targetLanguage !== sourceLanguage && (
-          <div>
-            <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2 flex items-center space-x-1">
-              <Globe className="h-3 w-3" />
-              <span>Translation</span>
-            </h4>
-            <Badge className="bg-blue-500 text-white">
-              {wordData.translations[targetLanguage] || `${word} (${targetLanguage})`}
-            </Badge>
           </div>
         )}
 
